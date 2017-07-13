@@ -26,5 +26,6 @@ module.exports = {
     'space-before-function-paren': 1,
     'semi': 1,
     'comma-dangle': 1,
+    'no-unused-vars': 1,
   }
 };

@@ -1,6 +1,9 @@
 import * as firebase from 'firebase'
 
-let firebaseService = {
+const firebaseService = {
+  db() {
+    return firebase.database();
+  },
   config: {
     apiKey: 'AIzaSyCQCGyiBY_W5VkA7eJ5s-quVujevV_WY2k',
     authDomain: 'vue-learn.firebaseapp.com',
@@ -9,9 +12,8 @@ let firebaseService = {
     storageBucket: 'vue-learn.appspot.com',
     messagingSenderId: '949208418517',
   },
-  connect () {
+  connect() {
     firebase.initializeApp(this.config);
-    this.auth.google().then(this.saveUser);
   },
   auth: {
     google: () => {
@@ -19,23 +21,14 @@ let firebaseService = {
         .addScope('profile')
         .addScope('email');
       return firebase.auth().signInWithPopup(provider)
-    }
-  },
-  saveUser(result) {
-    // This gives you a Google Access Token.
-    var token = result.credential.accessToken;
-    console.log(token);
-
-    // The signed-in user info.
-    var user = result.user;
-    console.log(user);
-
-    const bands = firebase.database().ref('bands');
-
-    bands.once('value').then(data => {
-      console.log(data.val());
-    })
+    },
+    signUp: (email, password) => {
+      return firebase.auth().createUserWithEmailAndPassword(email, password);
+    },
+    logIn: (email, password) => {
+      return firebase.auth().signInWithEmailAndPassword(email, password);
+    },
   }
-}
+};
 
 export {firebaseService}
