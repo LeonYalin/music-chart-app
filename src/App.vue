@@ -10,7 +10,7 @@
   }
 </script>
 
-<style>
+<style lang="scss" scoped>
   html {
     height: 100%;
   }

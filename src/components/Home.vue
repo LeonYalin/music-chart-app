@@ -2,7 +2,11 @@
   <div class="home">
 
     <!-- HEADER -->
-    <h1 class="header">Music Bands Chart</h1>
+    <div class="logout">
+      <el-button type="info" :plain="true" @click="onHelpClick">Help</el-button>
+      <el-button type="primary" @click="onLogOut">Log Out</el-button>
+    </div>
+    <h1 class="title">Music Chart</h1>
 
     <!-- ADD BAND ROW -->
     <div class="add-band">
@@ -22,32 +26,31 @@
     </div>
 
     <!--LIST OF BANDS -->
-    <el-table class="table" :data="bands" :empty-text="noItemsMsg" :border="true" :row-click="onRowClick">
-      <el-table-column prop="name"
-                       label="Band Name">
-      </el-table-column>
-      <el-table-column prop="rating"
-                       label="Rating">
-      </el-table-column>
-    </el-table>
+    <transition-group name="list">
+      <Band v-for="band in bands" :band="band" :key="band.key"></Band>
+    </transition-group>
+    <div v-show="bands.length === 0" class="no-items-msg">{{noItemsMsg}}</div>
   </div>
 </template>
 
 <script>
   import {firebaseService} from '../services/firebase.service';
+  import * as Band from './Band.vue';
 
   export default {
     name: 'hello',
+    components: {
+      'Band': Band,
+    },
     data() {
       return {
         bands: [],
         ratings: [
-          {key: '1', label: '1', value: '1'},
-          {key: '2', label: '2', value: '2'},
-          {key: '3', label: '3', value: '3'},
-          {key: '4', label: '4', value: '4'},
-          {key: '5', label: '5', value: '5'},
-          {key: '5+', label: '5+', value: '5+'},
+          {key: 1, label: 1, value: 1},
+          {key: 2, label: 2, value: 2},
+          {key: 3, label: 3, value: 3},
+          {key: 4, label: 4, value: 4},
+          {key: 5, label: 5, value: 5},
         ],
         addBand: {
           name: '',
@@ -60,31 +63,41 @@
     created() {
       firebaseService.connect();
       const bands = firebaseService.db().ref('bands');
+      let _bands = [];
 
       bands.on('value', data => {
         if (data.val()) {
+          _bands = [];
           data.forEach(itemObj => {
             const item = itemObj.val();
-            bands.push({name: item.name, rating: item.rating});
+            _bands.push({key: itemObj.key, name: item.name, rating: item.rating});
           });
+          this.bands = _bands;
         } else {
           this.noItemsMsg = 'No bands found';
+          this.bands = [];
         }
       });
     },
     methods: {
-      onRowClick() {
-
-      },
       onAddBandClick() {
         this.showAddNewBand = false;
         const bands = firebaseService.db().ref('bands');
-        const newBand = bands.push({
+        bands.push({
           name: this.addBand.name,
           rating: this.addBand.rating
         });
         this.$message({message: 'Band successfully Added', type: 'success'});
-      }
+      },
+      onLogOut() {
+        firebaseService.signOut().then(_ => {
+          this.$cookie.delete('rememberMe');
+          this.$router.push('/');
+        });
+      },
+      onHelpClick() {
+        this.$router.push('help');
+      },
     }
   }
 </script>
@@ -93,13 +106,19 @@
   .home {
     width: 600px;
     margin: 0 auto;
-    padding-top: 100px;
+    padding-top: 14px;
   }
 
-  .header {
+  .logout {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .title {
     font-size: 50px;
     text-align: center;
     color: #97a8be;
+    padding-top: 50px;
   }
 
   .add-band {
@@ -123,5 +142,20 @@
 
   .add-btn {
     margin-left: 10px;
+  }
+
+  .list-enter-active, .list-leave-active {
+    transition: all 0.5s;
+  }
+  .list-enter, .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .no-items-msg {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>

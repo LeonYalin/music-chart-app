@@ -13,22 +13,27 @@ const firebaseService = {
     messagingSenderId: '949208418517',
   },
   connect() {
-    firebase.initializeApp(this.config);
+    try {
+      firebase.app().name;
+    } catch (e) {
+      firebase.initializeApp(this.config);
+    }
   },
-  auth: {
-    google: () => {
-      const provider = new firebase.auth.GoogleAuthProvider()
-        .addScope('profile')
-        .addScope('email');
-      return firebase.auth().signInWithPopup(provider)
-    },
-    signUp: (email, password) => {
-      return firebase.auth().createUserWithEmailAndPassword(email, password);
-    },
-    logIn: (email, password) => {
-      return firebase.auth().signInWithEmailAndPassword(email, password);
-    },
-  }
+  google: () => {
+    const provider = new firebase.auth.GoogleAuthProvider()
+      .addScope('profile')
+      .addScope('email');
+    return firebase.auth().signInWithPopup(provider)
+  },
+  signUp: (email, password) => {
+    return firebase.auth().createUserWithEmailAndPassword(email, password);
+  },
+  logIn: (email, password) => {
+    return firebase.auth().signInWithEmailAndPassword(email, password);
+  },
+  signOut() {
+    return firebase.auth().signOut();
+  },
 };
 
 export {firebaseService}

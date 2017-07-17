@@ -1,6 +1,6 @@
 <template>
   <div id="login">
-    <h1 class="header">Music Bands Chart</h1>
+    <h1 class="header">Music Chart</h1>
     <el-tabs v-model="activeTab">
 
       <!-- EMAIL TAB -->
@@ -62,9 +62,9 @@
     methods: {
       onLogIn() {
         const self = this;
-        firebaseService.auth.logIn(this.form.email, this.form.password).then(result => {
+        firebaseService.logIn(this.form.email, this.form.password).then(result => {
           if (self.form.rememberMe) {
-            self.$cookie.set('rememberMe', result.credential.accessToken, {expires: '1Y'});
+            self.$cookie.set('rememberMe', 'lalala', {expires: '1Y'});
           }
           self.$router.push('home');
         }).catch(function (error) {
@@ -80,8 +80,8 @@
       },
       onSignUp() {
         const self = this;
-        firebaseService.auth.signUp(this.form.email, this.form.password).then(_ => {
-          self.$message({message: 'Congrats, this is a success message.', type: 'success'});
+        firebaseService.signUp(this.form.email, this.form.password).then(_ => {
+          self.$message({message: 'You have successfully Signed Up', type: 'success'});
           self.$router.push('home');
         }).catch(function (error) {
           const errorCode = error.code;
@@ -96,7 +96,7 @@
       },
       onLogInWithGoogle() {
         const self = this;
-        firebaseService.auth.google().then(_ => {
+        firebaseService.google().then(_ => {
           self.$router.push('home');
         });
       }
@@ -104,7 +104,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   #login {
     width: 600px;
     margin: 0 auto;
