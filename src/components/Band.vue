@@ -2,6 +2,7 @@
   <div class="band">
     <div class="name">
       <i class="el-icon-close close-icon" @click="onDeleteClick"/>
+      <img class="thumb" v-show="imageUrl" :src="imageUrl"/>
       <span>{{band.name}}</span>
     </div>
     <el-rate v-model="band.rating" @change="onRatingChange"></el-rate>
@@ -14,10 +15,13 @@
   export default {
     props: ['band'],
     data() {
-      return {}
+      return {
+        imageUrl: ''
+      }
     },
     created() {
       this.dbRef = firebaseService.db().ref(`bands/${this.band.key}`);
+      this.getImageUrl();
     },
     methods: {
       onRatingChange(val) {
@@ -31,6 +35,14 @@
           this.$message({message: 'Band successfully removed', type: 'success'});
         }
       },
+      getImageUrl() {
+        const storageRef = firebaseService.storage().ref(`bands/${this.band.name}`);
+        storageRef.getDownloadURL().then(url => {
+          this.imageUrl = url;
+        }, e => {
+          // no image
+        })
+      }
     },
   }
 </script>
@@ -57,6 +69,13 @@
   .name {
     display: flex;
     align-items: center;
+    height: 34px;
+  }
+
+  .thumb {
+    width: 30px;
+    margin-right: 5px;
+    border: 1px solid lightgray;
   }
 
   .close-icon {

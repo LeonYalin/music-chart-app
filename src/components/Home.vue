@@ -14,6 +14,7 @@
 
       <div class="ratings-wrapper" v-if="showAddNewBand">
         <el-input class="add-name" placeholder="Band name" v-model="addBand.name"></el-input>
+
         <el-select class="ratings-dropdown" v-model="addBand.rating" placeholder="Select">
           <el-option v-for="rating in ratings"
                      :key="rating.value"
@@ -21,6 +22,14 @@
                      :value="rating.value">
           </el-option>
         </el-select>
+
+        <el-upload class="upload-btn" ref="upload"
+                   action="https://jsonplaceholder.typicode.com/posts/"
+                   :show-file-list="false"
+                   :http-request="uploadHttpRequest">
+          <el-button type="primary" :plain="true">Upload Photo</el-button>
+        </el-upload>
+
         <el-button type="primary" class="add-btn" :plain="true" icon="plus" @click="onAddBandClick">Add</el-button>
       </div>
     </div>
@@ -65,6 +74,7 @@
       const bands = firebaseService.db().ref('bands');
       let _bands = [];
 
+      // Listen for DB changes
       bands.on('value', data => {
         if (data.val()) {
           _bands = [];
@@ -85,8 +95,9 @@
         const bands = firebaseService.db().ref('bands');
         bands.push({
           name: this.addBand.name,
-          rating: this.addBand.rating
+          rating: this.addBand.rating,
         });
+        this.$refs.upload.submit();
         this.$message({message: 'Band successfully Added', type: 'success'});
       },
       onLogOut() {
@@ -98,11 +109,21 @@
       onHelpClick() {
         this.$router.push('help');
       },
+      uploadHttpRequest(data) {
+        firebaseService.uploadFile(data.file, this.addBand.name, (snapshot) => {
+          // progress
+          const precentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        }, (e) => {
+          // error
+        }, () => {
+          // success
+        });
+      }
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .home {
     width: 600px;
     margin: 0 auto;
@@ -137,7 +158,7 @@
   }
 
   .add-name {
-    width: 200px;
+    width: 160px;
   }
 
   .add-btn {
