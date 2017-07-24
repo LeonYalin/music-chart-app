@@ -10,7 +10,7 @@
 
     <!-- ADD BAND ROW -->
     <div class="add-band">
-      <el-button type="primary" :plain="true" icon="plus" @click="showAddNewBand=true"></el-button>
+      <el-button type="primary" :plain="true" icon="plus" @click="showAddNewBand=!showAddNewBand"></el-button>
 
       <div class="ratings-wrapper" v-if="showAddNewBand">
         <el-input class="add-name" placeholder="Band name" v-model="addBand.name"></el-input>
@@ -30,7 +30,7 @@
           <el-button type="primary" :plain="true">Upload Photo</el-button>
         </el-upload>
 
-        <el-button type="primary" class="add-btn" :plain="true" icon="plus" @click="onAddBandClick">Add</el-button>
+        <el-button type="primary" class="add-btn" @click="onAddBandClick">Add New</el-button>
       </div>
     </div>
 
@@ -145,11 +145,12 @@
   .add-band {
     margin-bottom: 10px;
     display: flex;
-    justify-content: space-between;
   }
 
   .ratings-wrapper {
     display: flex;
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .ratings-dropdown {
@@ -161,7 +162,7 @@
     width: 160px;
   }
 
-  .add-btn {
+  .add-btn, .upload-btn {
     margin-left: 10px;
   }
 
